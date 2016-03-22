@@ -1,0 +1,2 @@
+%{"erl8583": {:git, "https://github.com/nubunto/erl8583.git", "3bfc0b2ae5352221599e114f8ad55066d4947d1a", []},
+  "ranch": {:hex, :ranch, "1.2.1"}}
