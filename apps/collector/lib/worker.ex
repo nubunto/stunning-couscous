@@ -1,5 +1,6 @@
 defmodule Collector.Worker do
   require Logger
+  alias Collector.Parser
 
   def accept do
     port = Application.fetch_env!(:collector, :port)
@@ -11,31 +12,35 @@ defmodule Collector.Worker do
   defp loop(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
     {:ok, pid} = Task.Supervisor.start_child(Collector.TaskSupervisor, fn ->
-      serve(client)
+      {:ok, buffer} = Agent.start_link(fn -> <<>> end)
+      serve(client, buffer)
     end)
     :ok = :gen_tcp.controlling_process(client, pid)
     loop(socket)
   end
 
-  defp serve(socket) do
+  defp serve(socket, buffer) do
     data = case read_line(socket) do
-      {:ok, data} ->
-        data
+      {:ok, <<header::size(16), data::binary>>} ->
+        buffered = Agent.get(buffer, &(&1))
+        if byte_size(data) < header && byte_size(buffered) < byte_size(data) do
+          Agent.update(buffer, fn b -> <<b::bitstring, data::bitstring>> end)
+          serve(socket, buffer)
+        else
+          Agent.update(buffer, fn _ -> <<>> end)
+          buffered <> data
+        end
       {:error, :closed} ->
         exit(:shutdown)
     end
 
+
     data |> Parser.parse |> inspect |> IO.puts
-    write_line(data, socket)
-    serve(socket)
+    serve(socket, buffer)
   end
 
   defp read_line(socket) do
     :gen_tcp.recv(socket, 0)
-  end
-
-  defp write_line(line, socket) do
-    :gen_tcp.send socket, line
   end
 
 end
