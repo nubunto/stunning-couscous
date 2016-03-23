@@ -18,7 +18,7 @@ defmodule Collector.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger],
+    [applications: [:logger, :postgrex, :ecto, :disp],
      env: [port: 4000],
      mod: {Collector, []}]
   end
@@ -37,6 +37,9 @@ defmodule Collector.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:erl8583, github: "nubunto/erl8583"}]
+    [{:erl8583, github: "nubunto/erl8583"},
+     {:postgrex, ">= 0.0.0"},
+     {:ecto, "~> 2.0.0-beta"},
+     {:disp, in_umbrella: true}]
   end
 end

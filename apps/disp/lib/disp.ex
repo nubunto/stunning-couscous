@@ -1,19 +1,36 @@
 defmodule Disp do
   use Application
 
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
     children = [
-      # Define workers and child supervisors to be supervised
-      # worker(Disp.Worker, [arg1, arg2, arg3]),
+      worker(Disp.Server, [Disp.Server])
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Disp.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+end
+
+defmodule Disp.Server do
+  use GenServer
+
+  # client
+
+  def start_link(name) do
+    GenServer.start_link(__MODULE__, :ok, name: name)
+  end
+
+  def init(:ok) do
+    {:ok, 0}
+  end
+
+  def handle_info({:process, %{tid: something}}, processed) do
+    spawn(fn ->
+      :timer.sleep 5000
+    end)
+    IO.puts "Processed #{processed}"
+    {:noreply, processed + 1}
   end
 end

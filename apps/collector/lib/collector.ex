@@ -7,7 +7,7 @@ defmodule Collector do
     import Supervisor.Spec, warn: false
 
     children = [
-      # Define workers and child supervisors to be supervised
+      supervisor(Collector.Repo, []),
       supervisor(Task.Supervisor, [[name: Collector.TaskSupervisor]]),
       worker(Task, [Collector.Worker, :accept, []]),
     ]

@@ -1,6 +1,5 @@
 defmodule Collector.Parser do
   def parse(data) do
-    # TODO: parse data.
     # data = to_char_list(data)
     # %Collector.Message{version: Enum.take(data, 2), message: data}
     data = :binary.bin_to_list(data)
@@ -19,7 +18,7 @@ defmodule Collector.Parser do
   defp parsep(map, data, :message_length, start, count) do
     case data |> Enum.slice(start, count) |> List.to_string() |> Integer.parse(10) do
       {message_length, _} -> Map.put(map, :message_length, message_length)
-      _ -> Map.put(map, :message_length, 0)
+      _                   -> Map.put(map, :message_length, 0)
     end
   end
 
@@ -27,8 +26,8 @@ defmodule Collector.Parser do
     case Enum.slice(data, start, count) do
       '1' -> Map.put(map, :origin_destiny, :received)
       '2' -> Map.put(map, :origin_destiny, :sent)
-      '3' -> Map.put(map, :origin_destiny, :received_sent)
-      _ -> Map.put(map, :origin_destiny, :unknown)
+      '3' -> Map.put(map, :origin_destiny, :receive_send)
+      _  -> Map.put(map, :origin_destiny, :unknown)
     end
   end
 
@@ -42,7 +41,7 @@ defmodule Collector.Parser do
       '23' -> Map.put(map, :external_device, :diners)
       '24' -> Map.put(map, :external_device, :amex)
       '40' -> Map.put(map, :external_device, :mov)
-      _ -> Map.put(map, :external_device, :unknown)
+      _  -> Map.put(map, :external_device, :unknown)
     end
   end
 

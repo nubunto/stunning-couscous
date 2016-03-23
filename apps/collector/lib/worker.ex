@@ -34,8 +34,7 @@ defmodule Collector.Worker do
         exit(:shutdown)
     end
 
-
-    data |> Parser.parse |> inspect |> IO.puts
+    send Disp.Server, {:process, Parser.parse(data)}
     serve(socket, buffer)
   end
 
