@@ -1,7 +1,6 @@
 defmodule Collector.Parser do
+
   def parse(data) do
-    # data = to_char_list(data)
-    # %Collector.Message{version: Enum.take(data, 2), message: data}
     data = :binary.bin_to_list(data)
     %Collector.Message{}
     |> parsep(data, :version, 0, 2)
@@ -14,6 +13,7 @@ defmodule Collector.Parser do
     |> parsep(data, :message_length, 50, 4)
     |> parsep(data, :message, 54, 4042)
   end
+
 
   defp parsep(map, data, :message_length, start, count) do
     case data |> Enum.slice(start, count) |> List.to_string() |> Integer.parse(10) do

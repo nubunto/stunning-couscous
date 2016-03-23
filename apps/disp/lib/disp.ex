@@ -16,21 +16,25 @@ end
 defmodule Disp.Server do
   use GenServer
 
-  # client
+  ## Client
 
   def start_link(name) do
     GenServer.start_link(__MODULE__, :ok, name: name)
   end
 
+  ## Server.
+
   def init(:ok) do
-    {:ok, 0}
+    {:ok, nil}
   end
 
-  def handle_info({:process, %{tid: something}}, processed) do
+  def handle_info({:process, payload}, _) do
     spawn(fn ->
-      :timer.sleep 5000
+      for {tid, transactions} <- payload,
+          trans <- transactions do
+            #IO.puts "Processing #{Map.get(trans, :external_device)}"
+      end
     end)
-    IO.puts "Processed #{processed}"
-    {:noreply, processed + 1}
+    {:noreply, nil}
   end
 end

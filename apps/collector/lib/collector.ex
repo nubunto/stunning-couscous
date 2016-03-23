@@ -7,9 +7,10 @@ defmodule Collector do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(Collector.Repo, []),
       supervisor(Task.Supervisor, [[name: Collector.TaskSupervisor]]),
       worker(Task, [Collector.Worker, :accept, []]),
+      worker(Collector.Aggregator, [Collector.Aggregator]),
+      worker(Collector.Cleanup, [1000])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

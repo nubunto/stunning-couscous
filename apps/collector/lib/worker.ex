@@ -34,7 +34,8 @@ defmodule Collector.Worker do
         exit(:shutdown)
     end
 
-    send Disp.Server, {:process, Parser.parse(data)}
+    #send Disp.Server, {:process, Parser.parse(data)}
+    Parser.parse(data) |> Collector.Aggregator.push
     serve(socket, buffer)
   end
 
